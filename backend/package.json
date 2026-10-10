@@ -16,6 +16,7 @@
     "test:phase9": "ts-node tests/phase9_finance.test.ts",
     "test:phase10": "ts-node tests/phase10_costing.test.ts",
     "test:phase11": "ts-node tests/phase11_admin.test.ts",
+    "test:phase12": "ts-node tests/phase12_concurrency.test.ts",
     "migrate:phase1": "psql -d textile_db -f database/init_phase1.sql",
     "migrate:phase2": "psql -d textile_db -f database/init_phase2.sql",
     "verify:db": "psql -d textile_db -f database/verify_phase2.sql"
