@@ -12,6 +12,7 @@
     "test:phase5": "ts-node tests/phase5_orders.test.ts",
     "test:phase6": "ts-node tests/phase6_production.test.ts",
     "test:phase7": "ts-node tests/phase7_quality.test.ts",
+    "test:phase8": "ts-node tests/phase8_dispatch.test.ts",
     "migrate:phase1": "psql -d textile_db -f database/init_phase1.sql",
     "migrate:phase2": "psql -d textile_db -f database/init_phase2.sql",
     "verify:db": "psql -d textile_db -f database/verify_phase2.sql"

@@ -8,6 +8,7 @@ import { rawMaterialsRouter } from './modules/raw-materials/raw-materials.contro
 import { orderRouter } from './modules/orders/order.controller';
 import { productionRouter } from './modules/production/production.controller';
 import { qualityRouter } from './modules/quality/quality.controller';
+import { dispatchRouter } from './modules/dispatch/dispatch.controller';
 import { sqlStateErrorFilter } from './middleware/sqlstate-error.filter';
 import { TxManager } from './database/tx-manager';
 
@@ -57,6 +58,7 @@ export function createApp(): Express {
   app.use('/api/v1/orders', orderRouter);
   app.use('/api/v1/production', productionRouter);
   app.use('/api/v1/quality', qualityRouter);
+  app.use('/api/v1/dispatches', dispatchRouter);
 
   // 4. Global 404 Route Not Found Handler
   app.use((req: Request, res: Response) => {
