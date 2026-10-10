@@ -65,46 +65,78 @@ export const App: React.FC = () => {
 
           {/* Protected Application Routes */}
           <Route element={<ProtectedLayout />}>
+            {/* Dashboard aliases */}
             <Route path="/" element={<DashboardHub />} />
+            <Route path="/app/dashboard" element={<DashboardHub />} />
+            <Route path="/dashboard" element={<DashboardHub />} />
 
-            {/* Raw Materials */}
+            {/* Raw Materials (W1) */}
             <Route path="/raw-materials" element={<StockPage />} />
+            <Route path="/app/raw-materials/stock" element={<StockPage />} />
             <Route path="/raw-materials/gate-inward" element={<GateInwardPage />} />
+            <Route path="/app/raw-materials/gate-entry" element={<GateInwardPage />} />
             <Route path="/raw-materials/receipts" element={<ReceiptsPage />} />
+            <Route path="/app/raw-materials/receipts" element={<ReceiptsPage />} />
 
-            {/* Orders */}
+            {/* Orders & Sales (W4) */}
             <Route path="/orders" element={<OrdersListPage />} />
+            <Route path="/app/orders/list" element={<OrdersListPage />} />
             <Route path="/orders/new" element={<NewOrderPage />} />
+            <Route path="/app/orders/new" element={<NewOrderPage />} />
             <Route path="/orders/tracker" element={<OrderTrackerPage />} />
+            <Route path="/app/orders/tracking" element={<OrderTrackerPage />} />
 
-            {/* Production */}
+            {/* Production Floor (W2) */}
             <Route path="/production" element={<FloorMatrixPage />} />
+            <Route path="/app/production/floor" element={<FloorMatrixPage />} />
             <Route path="/production/jobs" element={<JobsPage />} />
+            <Route path="/app/production/jobs" element={<JobsPage />} />
             <Route path="/production/shift-logger" element={<TouchShiftLoggerPage />} />
+            <Route path="/app/production/log-output" element={<TouchShiftLoggerPage />} />
             <Route path="/production/downtime" element={<DowntimePage />} />
+            <Route path="/app/production/downtime" element={<DowntimePage />} />
 
-            {/* Quality & Finished Goods */}
+            {/* Quality & Traceability (W3) */}
             <Route path="/quality" element={<QcInspectionPage />} />
+            <Route path="/app/quality/inspect" element={<QcInspectionPage />} />
             <Route path="/quality/rolls" element={<ShelfInventoryPage />} />
+            <Route path="/app/quality/shelf" element={<ShelfInventoryPage />} />
             <Route path="/quality/traceability" element={<RollTraceabilityPage />} />
+            <Route path="/app/quality/traceability" element={<RollTraceabilityPage />} />
             <Route path="/quality/defects" element={<DefectAnalyticsPage />} />
+            <Route path="/app/quality/defect-analytics" element={<DefectAnalyticsPage />} />
 
-            {/* Dispatch */}
+            {/* Dispatch & Logistics (W5) */}
             <Route path="/dispatch" element={<DispatchListPage />} />
+            <Route path="/app/dispatch/list" element={<DispatchListPage />} />
             <Route path="/dispatch/loading" element={<TruckLoadingPage />} />
+            <Route path="/app/dispatch/load" element={<TruckLoadingPage />} />
 
-            {/* Finance & Workforce */}
+            {/* Finance & Workforce (W6) */}
             <Route path="/finance/invoicing" element={<InvoicingPage />} />
+            <Route path="/app/finance/invoices" element={<InvoicingPage />} />
             <Route path="/finance/payments" element={<PaymentsPage />} />
+            <Route path="/app/finance/payments" element={<PaymentsPage />} />
             <Route path="/finance/supplier-bills" element={<SupplierBillsPage />} />
+            <Route path="/app/finance/supplier-bills" element={<SupplierBillsPage />} />
             <Route path="/finance/wages" element={<WorkforceWagesPage />} />
+            <Route path="/app/finance/wages" element={<WorkforceWagesPage />} />
             <Route path="/finance/period-close" element={<PeriodClosePage />} />
+            <Route path="/app/finance/period-close" element={<PeriodClosePage />} />
 
-            {/* Executive & Admin */}
+            {/* Executive Analytics */}
             <Route path="/executive" element={<ExecutiveDashboardPage />} />
+            <Route path="/app/executive/pl-statement" element={<ExecutiveDashboardPage />} />
+            <Route path="/app/executive/cost-analysis" element={<ExecutiveDashboardPage />} />
+            <Route path="/app/executive/machine-productivity" element={<FloorMatrixPage />} />
+
+            {/* Admin & Security */}
             <Route path="/admin/health" element={<ReconciliationHealthPage />} />
+            <Route path="/app/admin/reconciliation" element={<ReconciliationHealthPage />} />
             <Route path="/admin/audit" element={<AuditTrailPage />} />
+            <Route path="/app/admin/audit-logs" element={<AuditTrailPage />} />
             <Route path="/admin/masters" element={<MastersCrudPage />} />
+            <Route path="/app/admin/masters" element={<MastersCrudPage />} />
           </Route>
 
           {/* Catch-all redirect */}
@@ -116,4 +148,3 @@ export const App: React.FC = () => {
 };
 
 export default App;
-

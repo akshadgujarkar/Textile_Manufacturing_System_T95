@@ -27,11 +27,14 @@ apiClient.interceptors.response.use(
     const message = errorData?.message || error.message || 'An unexpected error occurred';
     const code = errorData?.code || 'NETWORK_ERROR';
 
-    if (error.response?.status === 401 && window.location.pathname !== '/login') {
-      localStorage.removeItem('tms_auth_token');
-      localStorage.removeItem('tms_auth_user');
-      // Dispatch custom event for session expiry
-      window.dispatchEvent(new Event('tms_session_expired'));
+    const isAuthEndpoint = error.config?.url?.includes('/auth/login');
+    if (error.response?.status === 401 && !isAuthEndpoint && window.location.pathname !== '/login') {
+      const existingToken = localStorage.getItem('tms_auth_token');
+      if (existingToken && !existingToken.startsWith('mock_')) {
+        localStorage.removeItem('tms_auth_token');
+        localStorage.removeItem('tms_auth_user');
+        window.dispatchEvent(new Event('tms_session_expired'));
+      }
     }
 
     return Promise.reject({
@@ -103,7 +106,11 @@ export const api = {
   // 4. Production Floor & Machines (W2)
   production: {
     getFloorStatus: async () => {
-      const res = await apiClient.get('/production/floor-status');
+      const res = await apiClient.get('/production/floor-matrix');
+      return res.data;
+    },
+    getFloorMatrix: async () => {
+      const res = await apiClient.get('/production/floor-matrix');
       return res.data;
     },
     getJobs: async (params?: any) => {

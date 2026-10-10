@@ -64,17 +64,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Attempt backend authentication
       try {
-        const res = await api.auth.login({ username, password: 'Password@123' });
-        if (res.token) {
+        const response = await api.auth.login({ username, password: 'Password@123' });
+        const data = response?.data || response;
+        const authToken = data?.accessToken || data?.token || response?.accessToken || response?.token;
+        const apiUser = data?.user || response?.user;
+
+        if (authToken) {
           const authUser: User = {
-            userId: res.user?.userId || 1,
-            username: res.user?.username || username,
-            roles: res.user?.roles || [selectedRole],
+            userId: apiUser?.userId || 1,
+            username: apiUser?.username || username,
+            roles: apiUser?.roles || [selectedRole],
             fullName: DEFAULT_ROLES_META[selectedRole]?.name || username,
           };
-          setToken(res.token);
+          setToken(authToken);
           setUser(authUser);
-          localStorage.setItem('tms_auth_token', res.token);
+          localStorage.setItem('tms_auth_token', authToken);
           localStorage.setItem('tms_auth_user', JSON.stringify(authUser));
           setIsLoading(false);
           return;
