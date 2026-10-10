@@ -1,0 +1,151 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Everest Textile Mills — Modern Industrial Slate & Indigo design system.
+ * Semantic tokens only; components never hardcode colors.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --font-sans: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root {
+  --radius: 0.625rem;
+  /* App background #F8FAFC */
+  --background: oklch(0.984 0.003 247.86);
+  /* Brand slate #0F172A */
+  --foreground: oklch(0.208 0.042 265.755);
+  /* Card surface #FFFFFF */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.208 0.042 265.755);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.208 0.042 265.755);
+  /* Deep indigo #4F46E5 */
+  --primary: oklch(0.488 0.243 264.376);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.967 0.003 264.542);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.967 0.003 264.542);
+  --muted-foreground: oklch(0.551 0.027 264.364);
+  --accent: oklch(0.945 0.02 270);
+  --accent-foreground: oklch(0.398 0.195 264.376);
+  /* Rose #E11D48 */
+  --destructive: oklch(0.645 0.246 16.439);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  /* Border #E2E8F0 */
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.488 0.243 264.376);
+  /* Emerald #059669 */
+  --success: oklch(0.696 0.17 162.48);
+  --success-foreground: oklch(0.984 0.003 247.858);
+  /* Amber #D97706 */
+  --warning: oklch(0.666 0.179 58.318);
+  --warning-foreground: oklch(0.984 0.003 247.858);
+  /* Sky #0284C7 */
+  --info: oklch(0.588 0.158 241.966);
+  --info-foreground: oklch(0.984 0.003 247.858);
+  /* Sidebar: brand slate */
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.929 0.013 255.508);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(0.279 0.041 260.031);
+}
+
+.dark {
+  --background: oklch(0.168 0.03 265.755);
+  --foreground: oklch(0.929 0.013 255.508);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.929 0.013 255.508);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.929 0.013 255.508);
+  --primary: oklch(0.585 0.22 264.376);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.929 0.013 255.508);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.32 0.08 264.376);
+  --accent-foreground: oklch(0.87 0.06 264.376);
+  --destructive: oklch(0.645 0.246 16.439);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.32 0.04 260.031);
+  --input: oklch(0.32 0.04 260.031);
+  --ring: oklch(0.585 0.22 264.376);
+  --success: oklch(0.696 0.17 162.48);
+  --success-foreground: oklch(0.168 0.03 265.755);
+  --warning: oklch(0.666 0.179 58.318);
+  --warning-foreground: oklch(0.168 0.03 265.755);
+  --info: oklch(0.588 0.158 241.966);
+  --info-foreground: oklch(0.168 0.03 265.755);
+  --sidebar: oklch(0.14 0.025 265.755);
+  --sidebar-foreground: oklch(0.929 0.013 255.508);
+  --sidebar-primary: oklch(0.585 0.22 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.24 0.04 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(0.24 0.04 260.031);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  code,
+  .font-code {
+    font-family: var(--font-mono);
+  }
+}
