@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { AlertTriangle, Package, PackagePlus } from "lucide-react";
 import { yarnStock, type YarnStockRow } from "@/data/tms";
@@ -8,21 +8,6 @@ import { MetricCard } from "@/components/tms/metric-card";
 import { DataTable } from "@/components/tms/data-table";
 import { StatusBadge } from "@/components/tms/status-badge";
 
-const title = "Raw Material Stock · Everest Textile Mills";
-const description = "Live yarn stock with on-hand, reserved and available quantities, reorder-level warnings and stock valuation.";
-
-export const Route = createFileRoute("/app/raw-materials/stock")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-    ],
-  }),
-  component: StockPage,
-});
-
 function stockStatus(y: YarnStockRow): "ok" | "low" | "critical" {
   const available = y.onHand - y.reserved;
   if (available <= 0) return "critical";
@@ -30,7 +15,7 @@ function stockStatus(y: YarnStockRow): "ok" | "low" | "critical" {
   return "ok";
 }
 
-function StockPage() {
+export function StockPage() {
   const [search, setSearch] = useState("");
   const [lowOnly, setLowOnly] = useState(false);
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Plus, ShoppingCart, Truck, CheckCircle2, Clock } from "lucide-react";
 import { orders, type Order, orderTotals, stageLabels } from "@/data/tms";
@@ -9,20 +9,7 @@ import { DataTable } from "@/components/tms/data-table";
 import { StatusBadge } from "@/components/tms/status-badge";
 import { CodeChip } from "@/components/tms/code-chip";
 
-const title = "Customer Orders · Everest Textile Mills";
-const description = "Searchable catalog of customer orders with commercial and production progress tracking.";
-
-export const Route = createFileRoute("/app/orders/list")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-    ],
-  }),
-  component: OrdersListPage,
-});
-
-function OrdersListPage() {
+export function OrdersListPage() {
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
 
@@ -97,7 +84,7 @@ function OrdersListPage() {
             key: "no",
             header: "Order #",
             render: (o) => (
-              <Link to="/app/orders/$orderId" params={{ orderId: o.no }} className="hover:underline">
+              <Link to={`/app/orders/${o.no}`} className="hover:underline">
                 <CodeChip code={o.no} />
               </Link>
             ),
@@ -150,15 +137,13 @@ function OrdersListPage() {
             render: (o) => (
               <div className="flex justify-end gap-2">
                 <Link
-                  to="/app/orders/$orderId"
-                  params={{ orderId: o.no }}
+                  to={`/app/orders/${o.no}`}
                   className="rounded px-2 py-1 text-xs font-medium border bg-card hover:bg-accent"
                 >
                   View Spine
                 </Link>
                 <Link
-                  to="/app/orders/tracking"
-                  search={{ q: o.no }}
+                  to={`/app/orders/tracking?q=${encodeURIComponent(o.no)}`}
                   className="rounded px-2 py-1 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Track Phone

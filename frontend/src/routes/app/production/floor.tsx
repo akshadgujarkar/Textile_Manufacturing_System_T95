@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Factory, AlertOctagon, Clock, Wrench, PlayCircle, PlusCircle, Layers } from "lucide-react";
 import { machines, type Machine } from "@/data/tms";
@@ -10,16 +10,6 @@ import { CodeChip } from "@/components/tms/code-chip";
 
 const title = "Live Floor Command Matrix · Everest Textile Mills";
 const description = "Real-time visual floor matrix across Spinning, Weaving, and Dyeing stages.";
-
-export const Route = createFileRoute("/app/production/floor")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-    ],
-  }),
-  component: FloorMatrixPage,
-});
 
 export function FloorMatrixPage() {
   const [activeStage, setActiveStage] = useState<string>("All");

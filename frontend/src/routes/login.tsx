@@ -1,25 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Factory, ScanBarcode } from "lucide-react";
 import { setUser, homeForRole } from "@/lib/tms-auth";
 import { staffUsers } from "@/data/tms";
 
-const title = "Sign in · Everest Textile Mills TMS";
-const description = "Sign in to the Everest Textile Mills manufacturing system — gate, production, quality, dispatch, finance and executive workspaces.";
-
-export const Route = createFileRoute("/login")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-    ],
-  }),
-  component: LoginPage,
-});
-
-function LoginPage() {
+export function LoginPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(staffUsers[7].role); // owner default
   const [password, setPassword] = useState("");
@@ -41,7 +26,7 @@ function LoginPage() {
           onSubmit={(e) => {
             e.preventDefault();
             setUser({ name: user.name, role: user.role, label: user.label });
-            void navigate({ to: homeForRole(user.role) });
+            navigate(homeForRole(user.role));
           }}
         >
           <div>

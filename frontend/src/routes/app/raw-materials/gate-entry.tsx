@@ -1,25 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Printer, Trash2 } from "lucide-react";
 import { suppliers, yarnTypes, orders } from "@/data/tms";
 import { inr } from "@/lib/tms-format";
 import { PageHeader } from "@/components/tms/page-header";
 import { CodeChip } from "@/components/tms/code-chip";
-
-const title = "Gate Inward Entry · Everest Textile Mills";
-const description = "Record supplier truck arrivals with multi-line yarn lots and print barcode lot tags.";
-
-export const Route = createFileRoute("/app/raw-materials/gate-entry")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-    ],
-  }),
-  component: GateEntryPage,
-});
 
 interface LotLine {
   yarnType: string;
@@ -32,7 +16,7 @@ interface LotLine {
 
 const emptyLine: LotLine = { yarnType: yarnTypes[0], colour: "", received: "", challanQty: "", rate: "", earmark: "" };
 
-function GateEntryPage() {
+export function GateEntryPage() {
   // Idempotency token for zero double-submits (spec FR-1.1 / validation rule 5)
   const [clientRequestId] = useState(() => crypto.randomUUID());
   const [supplier, setSupplier] = useState("");
@@ -70,7 +54,7 @@ function GateEntryPage() {
       {grn ? (
         <div className="mx-auto max-w-lg rounded-xl border bg-card p-8 text-center shadow-sm" role="status">
           <p className="text-sm font-medium text-muted-foreground">Goods receipt recorded</p>
-          <p className="mt-2 text-2xl font-bold"><CodeChip value={grn} /></p>
+          <p className="mt-2 text-2xl font-bold"><CodeChip code={grn} /></p>
           <p className="mt-3 text-sm text-muted-foreground">
             {lines.length} lot tag{lines.length > 1 ? "s" : ""} ready: {lots.join(", ")}
           </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Bell,
   Boxes,
@@ -119,13 +119,14 @@ function IstClock() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useLocation();
+  const pathname = location.pathname;
   const navigate = useNavigate();
   const [user, setUserState] = useState(() => getUser());
 
   useEffect(() => {
     if (!getUser()) {
-      void navigate({ to: "/login" });
+      navigate("/login");
     } else {
       setUserState(getUser());
     }
@@ -202,8 +203,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   const v = (e.target as HTMLInputElement).value.trim();
-                  if (v.startsWith("R-")) void navigate({ to: "/app/quality/traceability", search: { code: v } });
-                  else if (v) void navigate({ to: "/app/orders/tracking", search: { q: v } });
+                  if (v.startsWith("R-")) navigate(`/app/quality/traceability?code=${encodeURIComponent(v)}`);
+                  else if (v) navigate(`/app/orders/tracking?q=${encodeURIComponent(v)}`);
                 }
               }}
             />
@@ -236,7 +237,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-label="Sign out"
               onClick={() => {
                 clearUser();
-                void navigate({ to: "/login" });
+                navigate("/login");
               }}
             >
               <LogOut className="size-4" />
