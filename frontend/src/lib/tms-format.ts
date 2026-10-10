@@ -40,7 +40,12 @@ export function istDate(iso: string | Date, withTime = false): string {
   return `${base}, ${time} IST`;
 }
 
+export function date(iso: string | Date, withTime = false): string {
+  return istDate(iso, withTime);
+}
+
 export function pct(part: number, whole: number): number {
   if (!whole) return 0;
   return Math.round((part / whole) * 100);
 }
+
