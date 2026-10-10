@@ -6,6 +6,7 @@ import { env } from './config/environment';
 import { authRouter } from './modules/auth/auth.controller';
 import { rawMaterialsRouter } from './modules/raw-materials/raw-materials.controller';
 import { orderRouter } from './modules/orders/order.controller';
+import { productionRouter } from './modules/production/production.controller';
 import { sqlStateErrorFilter } from './middleware/sqlstate-error.filter';
 import { TxManager } from './database/tx-manager';
 
@@ -53,6 +54,7 @@ export function createApp(): Express {
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/raw-materials', rawMaterialsRouter);
   app.use('/api/v1/orders', orderRouter);
+  app.use('/api/v1/production', productionRouter);
 
   // 4. Global 404 Route Not Found Handler
   app.use((req: Request, res: Response) => {
