@@ -81,6 +81,16 @@ const OrderMaterialReqService = {
     await OrderMaterialReqRepository.updateReservation(requirementId, 0.000, 'unallocated');
     return this.getMaterialRequirementById(requirementId);
   },
+
+  async checkOrderSufficiency(orderId) {
+    const requirements = await OrderMaterialReqRepository.checkSufficiencyByOrderId(orderId);
+    return {
+      order_id: Number(orderId),
+      items: requirements,
+      all_sufficient: requirements.every((r) => Number(r.must_buy) === 0),
+    };
+  },
 };
 
 module.exports = OrderMaterialReqService;
+

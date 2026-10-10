@@ -105,6 +105,55 @@ const OrderMaterialReqRepository = {
       [reservedQty, allocationStatus, requirementId]
     );
   },
+
+  async checkSufficiencyByOrderId(orderId) {
+    const pool = getPool();
+    const sql = `
+      SELECT 
+        omr.requirement_id,
+        oi.order_id,
+        co.order_no,
+        omr.yarn_item_id,
+        yt.name AS yarn_type_name,
+        yi.colour_code AS yarn_colour_code,
+        yi.colour_name AS yarn_colour_name,
+        omr.required_qty,
+        omr.reserved_qty,
+        COALESCE(stk.current_stock, 0) AS on_hand_stock,
+        COALESCE(stk.current_stock, 0) - COALESCE(res.total_reserved, 0) AS free_stock,
+        COALESCE(po.open_po_qty, 0) AS on_order_po,
+        GREATEST(omr.required_qty - (COALESCE(stk.current_stock, 0) - COALESCE(res.total_reserved, 0)), 0) AS shortfall_now,
+        GREATEST(omr.required_qty - (COALESCE(stk.current_stock, 0) - COALESCE(res.total_reserved, 0)) - COALESCE(po.open_po_qty, 0), 0) AS must_buy
+      FROM order_material_requirement omr
+      JOIN order_item oi ON omr.order_item_id = oi.order_item_id
+      JOIN customer_order co ON oi.order_id = co.order_id
+      JOIN yarn_item yi ON omr.yarn_item_id = yi.yarn_item_id
+      JOIN yarn_type yt ON yi.yarn_type_id = yt.yarn_type_id
+      LEFT JOIN (
+        SELECT yarn_item_id, SUM(quantity) AS current_stock 
+        FROM yarn_stock_movement 
+        GROUP BY yarn_item_id
+      ) stk ON stk.yarn_item_id = omr.yarn_item_id
+      LEFT JOIN (
+        SELECT yarn_item_id, SUM(reserved_qty) AS total_reserved 
+        FROM order_material_requirement 
+        WHERE allocation_status IN ('reserved', 'partially_reserved')
+        GROUP BY yarn_item_id
+      ) res ON res.yarn_item_id = omr.yarn_item_id
+      LEFT JOIN (
+        SELECT poi.yarn_item_id, SUM(poi.quantity) AS open_po_qty
+        FROM purchase_order po
+        JOIN purchase_order_item poi ON po.po_id = poi.po_id
+        WHERE po.status IN ('approved', 'sent', 'partially_received')
+        GROUP BY poi.yarn_item_id
+      ) po ON po.yarn_item_id = omr.yarn_item_id
+      WHERE oi.order_id = ?
+      ORDER BY omr.requirement_id ASC
+    `;
+    const [rows] = await pool.query(sql, [orderId]);
+    return rows;
+  },
 };
 
 module.exports = OrderMaterialReqRepository;
+

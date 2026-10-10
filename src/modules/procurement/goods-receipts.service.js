@@ -128,6 +128,51 @@ const GoodsReceiptsService = {
       return GoodsReceiptsRepository.findById(receiptId);
     });
   },
+
+  async cancelReceipt(receiptId, { reason, employee_id } = {}) {
+    const receipt = await GoodsReceiptsRepository.findById(receiptId);
+    if (!receipt) {
+      throw createError(`Goods receipt with ID ${receiptId} not found`, 404, 'NOT_FOUND');
+    }
+
+    if (receipt.status === 'cancelled') {
+      throw createError(`Goods receipt #${receiptId} is already cancelled`, 400, 'ALREADY_CANCELLED');
+    }
+
+    return withTransaction(async (conn) => {
+      // 1. Post reversal movements for each received item
+      for (const item of receipt.items || []) {
+        // Calculate current stock to prevent negative balance
+        const currentStock = await StockMovementsRepository.calculateBalance(item.yarn_item_id, conn);
+        const qtyToReverse = Number(item.quantity_received);
+        if (currentStock - qtyToReverse < 0) {
+          throw createError(
+            `Cannot cancel receipt #${receiptId}: Yarn SKU #${item.yarn_item_id} has only ${currentStock} kg available, but reversal requires ${qtyToReverse} kg (yarn already consumed in production)`,
+            400,
+            'INSUFFICIENT_STOCK_FOR_REVERSAL'
+          );
+        }
+
+        await StockMovementsRepository.create({
+          yarn_item_id: item.yarn_item_id,
+          movement_type: 'adjustment',
+          quantity: -qtyToReverse, // Negative signed delta
+          unit_cost: null,
+          receipt_item_id: item.receipt_item_id,
+          production_job_id: null,
+          reverses_movement_id: null,
+          reason: `GRN Cancellation: ${receipt.receipt_no} - ${reason || 'Cancelled by manager'}`,
+          created_by_employee_id: employee_id || receipt.received_by_employee_id || 1,
+        }, conn);
+      }
+
+      // 2. Mark receipt as cancelled
+      await GoodsReceiptsRepository.updateStatus(receiptId, 'cancelled', conn);
+
+      return GoodsReceiptsRepository.findById(receiptId);
+    });
+  },
 };
 
 module.exports = GoodsReceiptsService;
+

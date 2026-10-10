@@ -84,6 +84,15 @@ const ReportsController = {
       next(err);
     }
   },
+
+  async reconciliation(req, res, next) {
+    try {
+      const report = await ReportsService.getReconciliationReport();
+      success(res, report);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = ReportsController;

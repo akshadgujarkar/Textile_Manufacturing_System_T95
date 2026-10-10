@@ -30,6 +30,16 @@ const GoodsReceiptsController = {
       next(err);
     }
   },
+
+  async cancel(req, res, next) {
+    try {
+      const receipt = await GoodsReceiptsService.cancelReceipt(req.params.id, req.body);
+      success(res, receipt);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = GoodsReceiptsController;
+

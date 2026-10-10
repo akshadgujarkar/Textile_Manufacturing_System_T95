@@ -31,7 +31,14 @@ const listGoodsReceiptsQuerySchema = z.object({
   status: z.enum(['received', 'cancelled']).optional(),
 });
 
+const cancelGoodsReceiptSchema = z.object({
+  reason: z.string().max(255).optional(),
+  employee_id: z.coerce.number().int().positive().optional(),
+});
+
 module.exports = {
   createGoodsReceiptSchema,
   listGoodsReceiptsQuerySchema,
+  cancelGoodsReceiptSchema,
 };
+

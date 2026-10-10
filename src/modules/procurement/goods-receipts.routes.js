@@ -8,10 +8,13 @@ const { idParam } = require('../../utils/validators');
 const {
   createGoodsReceiptSchema,
   listGoodsReceiptsQuerySchema,
+  cancelGoodsReceiptSchema,
 } = require('./goods-receipts.validator');
 
 router.get('/', validate({ query: listGoodsReceiptsQuerySchema }), GoodsReceiptsController.list);
 router.get('/:id', validate({ params: idParam }), GoodsReceiptsController.getById);
 router.post('/', validate({ body: createGoodsReceiptSchema }), GoodsReceiptsController.create);
+router.post('/:id/cancel', validate({ params: idParam, body: cancelGoodsReceiptSchema }), GoodsReceiptsController.cancel);
 
 module.exports = router;
+

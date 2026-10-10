@@ -13,5 +13,6 @@ router.get('/invoice-outstanding', ReportsController.invoiceOutstanding);
 router.get('/cost-by-order', ReportsController.costByOrder);
 router.get('/cost-by-machine', ReportsController.costByMachine);
 router.get('/wage-summary', ReportsController.wageSummary);
+router.get('/reconciliation', ReportsController.reconciliation);
 
 module.exports = router;

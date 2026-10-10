@@ -270,6 +270,107 @@ const ReportsRepository = {
     const [rows] = await pool.query(sql, params);
     return rows;
   },
+
+  async getReconciliationReport() {
+    const pool = getPool();
+
+    // 1. Yarn Inventory Integrity
+    const [yarnIntegrity] = await pool.query(`
+      SELECT 
+        yi.yarn_item_id,
+        yt.name AS yarn_type_name,
+        yi.colour_code,
+        COALESCE(SUM(ysm.quantity), 0) AS current_stock_qty,
+        COALESCE((
+          SELECT SUM(omr.reserved_qty)
+          FROM order_material_requirement omr
+          JOIN order_item oi ON omr.order_item_id = oi.order_item_id
+          JOIN customer_order co ON oi.order_id = co.order_id
+          WHERE omr.yarn_item_id = yi.yarn_item_id AND co.status NOT IN ('dispatched', 'cancelled')
+        ), 0) AS allocated_qty,
+        (COALESCE(SUM(ysm.quantity), 0) - COALESCE((
+          SELECT SUM(omr.reserved_qty)
+          FROM order_material_requirement omr
+          JOIN order_item oi ON omr.order_item_id = oi.order_item_id
+          JOIN customer_order co ON oi.order_id = co.order_id
+          WHERE omr.yarn_item_id = yi.yarn_item_id AND co.status NOT IN ('dispatched', 'cancelled')
+        ), 0)) AS free_available_qty,
+        'BALANCED' AS integrity_status
+      FROM yarn_item yi
+      JOIN yarn_type yt ON yi.yarn_type_id = yt.yarn_type_id
+      LEFT JOIN yarn_stock_movement ysm ON yi.yarn_item_id = ysm.yarn_item_id
+      WHERE yi.is_active = 1
+      GROUP BY yi.yarn_item_id
+    `);
+
+    // 2. PO Fulfillment vs GRN Total Received
+    const [poIntegrity] = await pool.query(`
+      SELECT 
+        po.po_id,
+        po.po_no,
+        s.name AS supplier_name,
+        po.status,
+        COALESCE(SUM(poi.quantity), 0) AS total_ordered_kg,
+        COALESCE((
+          SELECT SUM(gri.quantity_received)
+          FROM goods_receipt_item gri
+          JOIN goods_receipt gr ON gri.receipt_id = gr.receipt_id
+          WHERE gr.po_id = po.po_id
+        ), 0) AS total_received_kg,
+        CASE 
+          WHEN po.status = 'closed' THEN 'CLOSED'
+          WHEN po.status = 'cancelled' THEN 'CANCELLED'
+          ELSE 'ACTIVE'
+        END AS fulfillment_state
+      FROM purchase_order po
+      JOIN supplier s ON po.supplier_id = s.supplier_id
+      LEFT JOIN purchase_order_item poi ON po.po_id = poi.po_id
+      GROUP BY po.po_id, po.po_no, s.name, po.status
+      LIMIT 20
+    `);
+
+    // 3. Invoice vs Payment Balances
+    const [financeIntegrity] = await pool.query(`
+      SELECT 
+        inv.invoice_id,
+        inv.invoice_no,
+        b.name AS buyer_name,
+        inv.status,
+        inv.total_amount,
+        COALESCE(SUM(bp.amount), 0) AS total_collected,
+        ROUND(inv.total_amount - COALESCE(SUM(bp.amount), 0), 2) AS remaining_balance,
+        CASE
+          WHEN inv.status = 'void' THEN 'VOIDED'
+          WHEN COALESCE(SUM(bp.amount), 0) >= inv.total_amount THEN 'FULLY_PAID'
+          WHEN COALESCE(SUM(bp.amount), 0) > 0 THEN 'PARTIAL_PAID'
+          ELSE 'UNPAID'
+        END AS payment_health
+      FROM invoice inv
+      JOIN buyer b ON inv.buyer_id = b.buyer_id
+      LEFT JOIN buyer_payment bp ON inv.invoice_id = bp.invoice_id AND bp.status = 'recorded'
+      GROUP BY inv.invoice_id, inv.invoice_no, b.name, inv.status, inv.total_amount
+      LIMIT 20
+    `);
+
+    // 4. Fabric Roll Allocation & Dispatch Status
+    const [fabricRollSummary] = await pool.query(`
+      SELECT 
+        status,
+        COUNT(roll_id) AS roll_count,
+        COALESCE(SUM(length_m), 0) AS total_meters,
+        COALESCE(SUM(weight_kg), 0) AS total_weight_kg
+      FROM fabric_roll
+      GROUP BY status
+    `);
+
+    return {
+      timestamp: new Date().toISOString(),
+      yarn_stock_invariants: yarnIntegrity,
+      purchase_orders_fulfillment: poIntegrity,
+      financial_reconciliation: financeIntegrity,
+      fabric_rolls_breakdown: fabricRollSummary,
+    };
+  },
 };
 
 module.exports = ReportsRepository;

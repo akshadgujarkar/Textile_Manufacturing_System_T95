@@ -174,6 +174,13 @@ const GoodsReceiptsRepository = {
     );
     return result.insertId;
   },
+
+  async updateStatus(receiptId, status, conn) {
+    const db = conn || getPool();
+    await db.query(`UPDATE goods_receipt SET status = ? WHERE receipt_id = ?`, [status, receiptId]);
+    return this.findById(receiptId);
+  },
 };
 
 module.exports = GoodsReceiptsRepository;
+

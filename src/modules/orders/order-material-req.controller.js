@@ -48,6 +48,16 @@ const OrderMaterialReqController = {
       next(err);
     }
   },
+
+  async checkSufficiency(req, res, next) {
+    try {
+      const result = await OrderMaterialReqService.checkOrderSufficiency(req.params.orderId);
+      success(res, result);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 module.exports = OrderMaterialReqController;
+

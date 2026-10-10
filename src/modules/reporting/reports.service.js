@@ -39,6 +39,10 @@ const ReportsService = {
   async getWageSummary(query) {
     return ReportsRepository.getWageSummary(query);
   },
+
+  async getReconciliationReport() {
+    return ReportsRepository.getReconciliationReport();
+  },
 };
 
 module.exports = ReportsService;

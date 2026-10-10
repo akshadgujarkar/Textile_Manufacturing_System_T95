@@ -178,17 +178,26 @@ npm run seed
 
 ## Running the Application
 
+### 1. Backend Server
 ```bash
-# Development mode with hot-reloading (node --watch)
+# Development mode with hot-reloading (nodemon)
 npm run dev
 
 # Production mode
 npm start
 ```
-
-Once running, verify system health:
 - **Base Health**: `GET http://localhost:3000/api/v1/health`
 - **Database Health**: `GET http://localhost:3000/api/v1/health/database`
+
+### 2. Frontend Material You Web App (React + Vite)
+```bash
+# Start frontend client in development mode
+npm run client:dev
+
+# Build production bundle
+npm run client:build
+```
+- **Frontend URL**: `http://localhost:5173` (Proxies all `/api/*` calls automatically to the backend on `localhost:3000`)
 
 ---
 
