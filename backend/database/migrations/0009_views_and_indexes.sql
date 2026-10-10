@@ -505,6 +505,8 @@ JOIN dispatch_item di ON d.dispatch_id = di.dispatch_id AND di.state = 'active'
 JOIN fabric_roll fr ON di.roll_id = fr.roll_id
 JOIN production_job pj ON fr.job_id = pj.job_id
 JOIN order_item oi ON pj.order_item_id = oi.order_item_id
+JOIN fabric_product fp ON oi.product_id = fp.product_id
+JOIN colour c ON oi.colour_id = c.colour_id
 GROUP BY d.dispatch_id, d.dispatch_no, d.status, d.buyer_id, b.name, d.order_id, co.order_no, oi.order_item_id, fp.name, c.name, oi.agreed_rate;
 
 CREATE OR REPLACE VIEW v_invoice_balance AS
