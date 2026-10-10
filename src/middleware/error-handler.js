@@ -12,12 +12,13 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
   let details = err.details || [];
 
   // Handle Zod validation errors
-  if (err.name === 'ZodError') {
+  if (err.name === 'ZodError' || err.issues) {
     status = 400;
     code = 'VALIDATION_ERROR';
     message = 'The request contains invalid data';
-    details = err.errors.map((e) => ({
-      field: e.path.join('.'),
+    const issues = err.issues || err.errors || [];
+    details = issues.map((e) => ({
+      field: e.path?.join('.') || '',
       message: e.message,
     }));
   }

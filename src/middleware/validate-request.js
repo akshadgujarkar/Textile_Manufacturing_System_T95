@@ -16,10 +16,18 @@ function validate(schemas) {
         req.body = schemas.body.parse(req.body);
       }
       if (schemas.params) {
-        req.params = schemas.params.parse(req.params);
+        const parsedParams = schemas.params.parse(req.params);
+        for (const key of Object.keys(req.params)) {
+          delete req.params[key];
+        }
+        Object.assign(req.params, parsedParams);
       }
       if (schemas.query) {
-        req.query = schemas.query.parse(req.query);
+        const parsedQuery = schemas.query.parse(req.query);
+        for (const key of Object.keys(req.query)) {
+          delete req.query[key];
+        }
+        Object.assign(req.query, parsedQuery);
       }
       next();
     } catch (err) {

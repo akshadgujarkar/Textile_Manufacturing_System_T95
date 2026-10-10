@@ -62,10 +62,29 @@ async function checkDatabaseHealth() {
   const start = Date.now();
   const pool = getPool();
   const [rows] = await pool.query('SELECT 1 AS ping');
-  if (!rows || rows[0]?.ping !== 1) {
+  if (!rows || Number(rows[0]?.ping) !== 1) {
     throw new Error('Unexpected ping response from MySQL');
   }
   return { ok: true, latency_ms: Date.now() - start };
+}
+/**
+ * Run a callback inside a database transaction.
+ * Automatically handles begin, commit, and rollback.
+ */
+async function withTransaction(callback) {
+  const pool = getPool();
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const result = await callback(conn);
+    await conn.commit();
+    return result;
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
 /**
@@ -78,4 +97,4 @@ async function closePool() {
   }
 }
 
-module.exports = { getPool, createPool, checkDatabaseHealth, closePool };
+module.exports = { getPool, createPool, checkDatabaseHealth, closePool, withTransaction };
