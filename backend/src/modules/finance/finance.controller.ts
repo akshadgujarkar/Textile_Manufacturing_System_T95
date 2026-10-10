@@ -395,3 +395,87 @@ financeRouter.get(
     }
   }
 );
+
+/**
+ * GET /api/v1/finance/periods
+ * List all accounting periods
+ * Roles: accounts, owner, admin, auditor, staff_readonly
+ */
+financeRouter.get(
+  '/periods',
+  authenticateJwt,
+  requireRoles('accounts', 'owner', 'admin', 'staff_readonly'),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const periods = await FinanceService.listAccountingPeriods();
+      res.status(200).json({
+        success: true,
+        count: periods.length,
+        data: periods,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * POST /api/v1/finance/periods/:id/close
+ * Close an accounting period (WF-14)
+ * Roles: accounts, owner, admin
+ */
+financeRouter.post(
+  '/periods/:id/close',
+  authenticateJwt,
+  requireRoles('accounts', 'owner', 'admin'),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const periodId = parseInt(req.params.id, 10);
+      if (isNaN(periodId)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ID', message: 'Period ID must be an integer.' },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const closedPeriod = await FinanceService.closeAccountingPeriod(periodId, req.user!.userId);
+
+      res.status(200).json({
+        success: true,
+        data: closedPeriod,
+        message: `Accounting period #${periodId} closed permanently. Financial transactions for this period are now locked.`,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error: any) {
+      if (error.message === 'PERIOD_NOT_FOUND') {
+        res.status(404).json({
+          success: false,
+          error: { code: 'PERIOD_NOT_FOUND', message: `Accounting period #${req.params.id} was not found.` },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (error.message && error.message.startsWith('PERIOD_ALREADY_CLOSED')) {
+        res.status(409).json({
+          success: false,
+          error: { code: 'PERIOD_ALREADY_CLOSED', message: error.message },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      if (error.message && error.message.startsWith('DRAFT_WAGES_REMAIN')) {
+        res.status(422).json({
+          success: false,
+          error: { code: 'DRAFT_WAGES_REMAIN', message: error.message },
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      next(error);
+    }
+  }
+);
+

@@ -10,6 +10,8 @@ import { productionRouter } from './modules/production/production.controller';
 import { qualityRouter } from './modules/quality/quality.controller';
 import { dispatchRouter } from './modules/dispatch/dispatch.controller';
 import { financeRouter } from './modules/finance/finance.controller';
+import { workforceRouter } from './modules/workforce/workforce.controller';
+import { executiveRouter } from './modules/executive/executive.controller';
 import { sqlStateErrorFilter } from './middleware/sqlstate-error.filter';
 import { TxManager } from './database/tx-manager';
 
@@ -61,6 +63,8 @@ export function createApp(): Express {
   app.use('/api/v1/quality', qualityRouter);
   app.use('/api/v1/dispatches', dispatchRouter);
   app.use('/api/v1/finance', financeRouter);
+  app.use('/api/v1/workforce', workforceRouter);
+  app.use('/api/v1/executive', executiveRouter);
 
   // 4. Global 404 Route Not Found Handler
   app.use((req: Request, res: Response) => {

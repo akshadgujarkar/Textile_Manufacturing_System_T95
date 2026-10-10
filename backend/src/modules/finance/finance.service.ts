@@ -465,4 +465,82 @@ export class FinanceService {
       items,
     };
   }
+
+  /**
+   * List Accounting Periods (sorted by period_start DESC)
+   */
+  static async listAccountingPeriods(): Promise<any[]> {
+    return await TxManager.query<any>(
+      `SELECT period_id, period_start, period_end, status, closed_at, closed_by, created_at, updated_at
+         FROM accounting_period
+        ORDER BY period_start DESC;`
+    );
+  }
+
+  /**
+   * WF-14: Close Accounting Period
+   * Permanently closes the accounting period, locking all financial transactions,
+   * wage records, costs, and invoices for that month (BR004).
+   * Verified by trigger trg_period_before that 0 draft wage records remain.
+   */
+  static async closeAccountingPeriod(
+    periodId: number,
+    userId: number
+  ): Promise<any> {
+    return await TxManager.withTransaction(
+      {
+        userId,
+        source: 'FinanceService.closeAccountingPeriod',
+        reason: `Close accounting period #${periodId}`,
+      },
+      async (client: PoolClient) => {
+        // 1. Verify period existence & current status
+        const periodRes = await client.query(
+          `SELECT period_id, period_start, period_end, status 
+             FROM accounting_period 
+            WHERE period_id = $1 
+              FOR UPDATE;`,
+          [periodId]
+        );
+
+        if (periodRes.rowCount === 0) {
+          throw new Error('PERIOD_NOT_FOUND');
+        }
+
+        const period = periodRes.rows[0];
+        if (period.status === 'closed') {
+          throw new Error('PERIOD_ALREADY_CLOSED: Accounting period is already closed.');
+        }
+
+        // 2. Pre-check: Ensure zero draft wage records remain in the period
+        const draftWagesRes = await client.query(
+          `SELECT COUNT(*) AS draft_count 
+             FROM wage_record 
+            WHERE period_id = $1 AND status = 'draft';`,
+          [periodId]
+        );
+
+        const draftCount = parseInt(draftWagesRes.rows[0]?.draft_count || '0', 10);
+        if (draftCount > 0) {
+          throw new Error(`DRAFT_WAGES_REMAIN: Cannot close period with ${draftCount} draft wage records. Approve or reverse them first.`);
+        }
+
+        // 3. Update period status to closed (trigger trg_period_before sets closed_at & closed_by)
+        const updateRes = await client.query(
+          `UPDATE accounting_period
+              SET status = 'closed',
+                  closed_at = now(),
+                  closed_by = $2,
+                  updated_by = $2,
+                  updated_at = now()
+            WHERE period_id = $1
+            RETURNING *;`,
+          [periodId, userId]
+        );
+
+        return updateRes.rows[0];
+      }
+    );
+  }
 }
+
